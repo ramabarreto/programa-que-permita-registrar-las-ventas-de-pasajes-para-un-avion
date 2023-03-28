@@ -1,0 +1,132 @@
+import json
+#import requests
+def opciones():
+    print("======================================") 
+    print("            MENU DE INICIO       ")
+    print("======================================")
+    print("#OPCIONES: ")
+    print("*Comprar un Pasaje ---------> ( 1 )")
+
+    print("*Cerrar el Vuelo------------> ( 2 )")
+
+    print("*Finalizar el Programa------> ( 3 )")
+    
+    opc = int(input("Ingrese un Número Por favor: "))
+    return opc
+def TP():
+    direcciones = []
+    ubicacionFila = []
+    pasajeros = []
+    ubicacionAsiento = []
+    f = []
+    for i in range (0, 20):
+        f.append([0]*6)
+    opc = opciones()
+    print("======================================")
+    while opc != 3:
+        if opc == 1:
+            print("n° de hilera:           (1)'(2)'(3)'(4)'(5)'(6)") 
+            for i in range(0, 20):
+                if i+1 > 9:
+                    print("n° de fila:(", i+1, ") ---> ", f[i][0],"'", f[i][1],"'", f[i][2],"'", f[i][3],"'", f[i][4],"'", f[i][5])
+                    
+                else:
+                    print("n° de fila: (", i+1, ") ---> ", f[i][0],"'", f[i][1],"'", f[i][2],"'", f[i][3],"'", f[i][4],"'", f[i][5])
+                
+                    
+            print("======================================")
+            print("*Usted está viendo los Asientos del Avión.")
+            print("*La ""X"" es Asiento OCUPADO")
+            print("*El ""0"" es Asiento DISPONIBLE")
+            print("¿Desea elegir un asiento? (si o no)")
+            print("*si ingresa “no” se le asignará aleatoreamente un asiento")
+            pickseat = str(input("---> "))
+            while (pickseat.lower() != "si") or (pickseat.lower() != "no"):
+                pickseat = str(input("---> "))
+            print("======================================")
+            if pickseat.lower() == "si":
+                Asiento = 0
+                while Asiento == 0:
+                    pickfil = int(input("Elija la fila que desea (de 1 a 20): "))
+                    while (pickfil > 20) or (pickfil < 1):
+                        print("La fila elegida es incorrecta")
+                        pickfil = int(input("Elija la fila que desea (de 1 a 20): "))
+                    pickcol = int(input("Elija la hilera que desea (de 1 a 6): "))
+                    while (pickcol > 6) or (pickcol < 1):
+                        print("La columna elegida es incorrecta")
+                        pickcol = int(input("Elija la hilera que desea (de 1 a 6): "))
+                    if f[(pickfil)-1][(pickcol)-1] == 0:
+                        print("Ha comprado el asiento en la fila: ", pickfil," y en la hilera: ", pickcol)
+                        print("======================================")
+                        Asiento = 1
+                        ubicacionFila.append(pickfil)
+                        ubicacionAsiento.append(pickcol)
+                        f[(pickfil)-1][(pickcol)-1] = "X"
+                        NOMBRE = input("Ingrese su nombre: ")
+                        pasajeros.append(NOMBRE)
+                        print("*si vive en CABA se le aplicará 10% OFF!")
+                        DOMICILIO = input("Ingrese su domicilio: ")
+                        print("======================================")
+                        direccion=DOMICILIO
+                        direcciones.append(DOMICILIO)
+                        url="http://servicios.usig.buenosaires.gob.ar/normalizar/?direccion="
+                        response = requests.get(url+direccion)
+                        obj = json.loads(response.content)
+                        if len(obj["direccionesNormalizadas"])>0:
+                            print("*DOMICILIO VERIFICADO!")
+                            if obj["direccionesNormalizadas"][0]["cod_partido"]=="caba":
+                                
+                                pasaje=15000-1500
+                                print("*EL COSTO DEL PASAJE ES $",pasaje)                             
+                            else:
+                                pasaje=15000
+                                print("*EL COSTO DEL PASAJE ES $", pasaje)
+                            print("*LA COMPRA SE REALIZÓ EXITOSAMENTE!")
+                    else:
+                        print("El asiento se encuentra ocupado, elija otro por favor")
+                    
+                        
+            if pickseat.lower()=="no":
+                Asiento2 = 0
+                for i in range (0, 20):
+                    for j in range (0, 6):
+                        if (f[i][j] == 0) and (Asiento2 == 0):
+                            f[i][j] = "X"
+                            Asiento2 = 1
+                            r = i + 1
+                            l = j + 1
+                            ubicacionFila.append(r)
+                            ubicacionAsiento.append(l)
+                            print("Ha comprado el asiento en la fila:", i+1,"y en la hilera:", j+1)
+                            print("======================================")
+                            NOMBRE = input("Ingrese su nombre: ")
+                            pasajeros.append(NOMBRE)
+                            print("*si vive en CABA se le aplicará 10% OFF!")
+                            DOMICILIO = input("Ingrese su domicilio: ")
+                            print("======================================")
+                            direcciones.append(DOMICILIO)
+                            direccion=DOMICILIO
+                            url="http://servicios.usig.buenosaires.gob.ar/normalizar/?direccion="
+                            response = requests.get(url+direccion)
+                            obj = json.loads(response.content)
+                            if len(obj["direccionesNormalizadas"])>0:
+                                print("*DOMICILIO VERIFICADO!")
+                                if obj["direccionesNormalizadas"][0]["cod_partido"]=="caba":
+                                    
+                                    pasaje=15000-1500
+                                    print("*EL COSTO DEL PASAJE ES $",pasaje)                             
+                                else:
+                                    pasaje=15000
+                                    print("*EL COSTO DEL PASAJE ES $", pasaje)
+                            print("*LA COMPRA SE REALIZÓ EXITOSAMENTE!")    
+        if opc == 2:
+            print("======================================")
+            for i in range(0, len(pasajeros)):
+                print("El pasajero ", pasajeros[i]," de domicilio ", direcciones[i]," está ubicado en la fila ", ubicacionFila[i]," y en el asiento ", ubicacionAsiento[i])
+            print("======================================")
+            print("*El PORCENTAJE DE OCUPACION es: ", (len(pasajeros)/(120))*100, "%")
+            print("*El TOTAL DE PASAJEROS es: ",len(pasajeros))
+        opc = opciones()
+    print("======================================")
+    print("Muchas Gracias, Vuelva Pronto!")
+TP()
